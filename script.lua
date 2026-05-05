@@ -2,8 +2,8 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "Defend Your Castle | Automation",
-   LoadingTitle = "Loading Script...",
-   LoadingSubtitle = "by Antigravity",
+   LoadingTitle = "Defend Your Castle | Premium",
+   LoadingSubtitle = "by ngminhtam-vietnam",
    ConfigurationSaving = {
       Enabled = true,
       FolderName = "DefendYourCastle",
@@ -115,6 +115,102 @@ MainTab:CreateToggle({
    Flag = "ToggleRequestEnemies",
    Callback = function(Value)
       Flags.AutoRequestEnemies = Value
+   end,
+})
+
+local MiscTab = Window:CreateTab("Misc", 4483362458) -- Misc Tab
+
+MiscTab:CreateSection("Utilities")
+
+MiscTab:CreateButton({
+   Name = "Enable Anti-AFK",
+   Callback = function()
+      local vu = game:GetService("VirtualUser")
+      game:GetService("Players").LocalPlayer.Idled:Connect(function()
+         vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+         task.wait(1)
+         vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+      end)
+      Rayfield:Notify({
+         Title = "Anti-AFK Enabled",
+         Content = "You will no longer be kicked for idling.",
+         Duration = 5,
+         Image = 4483362458,
+      })
+   end,
+})
+
+MiscTab:CreateSlider({
+   Name = "WalkSpeed",
+   Range = {16, 250},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "SliderWalkSpeed",
+   Callback = function(Value)
+      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+   end,
+})
+
+MiscTab:CreateSlider({
+   Name = "JumpPower",
+   Range = {50, 500},
+   Increment = 1,
+   Suffix = "Power",
+   CurrentValue = 50,
+   Flag = "SliderJumpPower",
+   Callback = function(Value)
+      game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+   end,
+})
+
+MiscTab:CreateSection("Server")
+
+MiscTab:CreateButton({
+   Name = "Server Hop",
+   Callback = function()
+      local PlaceID = game.PlaceId
+      local AllIDs = {}
+      local foundAnything = ""
+      local ActualID = ""
+      local function TPReturner()
+         local Site;
+         if foundAnything == "" then
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+         else
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+         end
+         local ID = ""
+         if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+            foundAnything = Site.nextPageCursor
+         end
+         local num = 0;
+         for i,v in pairs(Site.data) do
+            ID = tostring(v.id)
+            if tonumber(v.maxPlayers) > tonumber(v.playing) then
+               for _,Existing in pairs(AllIDs) do
+                  if num ~= 0 then
+                     if ID == tostring(Existing) then
+                        continue
+                     end
+                  else
+                     num = 1
+                  end
+               end
+               table.insert(AllIDs, ID)
+               task.wait()
+               game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+            end
+         end
+      end
+      TPReturner()
+   end,
+})
+
+MiscTab:CreateButton({
+   Name = "Rejoin Server",
+   Callback = function()
+      game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
    end,
 })
 
