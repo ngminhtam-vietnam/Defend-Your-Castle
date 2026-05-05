@@ -33,7 +33,7 @@ local BlueprintList = {
     "Minigun", "The Forcefielder", "Trident Tower", "Octogun"
 }
 
--- Khởi tạo giá trị cho SelectedBlueprints (Tất cả đều tắt lúc đầu)
+-- Khởi tạo giá trị cho SelectedBlueprints
 for _, name in pairs(BlueprintList) do
     SelectedBlueprints[name] = false
 end
@@ -103,8 +103,6 @@ ShopTab:CreateButton({
     Callback = function()
         for _, name in pairs(BlueprintList) do
             SelectedBlueprints[name] = true
-            -- Rayfield không hỗ trợ cập nhật Toggle từ code một cách trực tiếp, 
-            -- nên bạn cần bật thủ công hoặc dùng Master Switch
         end
         Rayfield:Notify({Title = "Thông báo", Content = "Đã chọn tất cả trụ!", Duration = 3})
     end,
